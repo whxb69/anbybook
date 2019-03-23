@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="sqlite_jdbc-169a40c92b2-5ed47571bbbc1e67" provider="generic" driver="sqlite_jdbc" name="SQLite - blog.db" save-password="true" read-only="false">
+		<connection server="" database="G:\anby\Flask\database\blog.db" url="jdbc:sqlite:G:\anby\Flask\database\blog.db" type="dev"/>
+	</data-source>
+	<filters/>
+</data-sources>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Village - Login{% endblock %}
+
+{%block page_content%}
+<div class="container">
+<div class="page-header">
+    <h1>用户信息</h1>
+</div>
+<div class="col-md-4">
+    <li><h3>用户名</h3>{{ current_user.name }}</li>
+    <li><h3>邮箱</h3>{{ current_user.email }}</li>
+    <li><h3>简介</h3>未设置</li>
+    <button type="button" class="btn btn-info">修改信息</button>
+</div>
+</div>
+{% endblock %}

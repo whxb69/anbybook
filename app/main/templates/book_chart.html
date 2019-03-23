@@ -1,0 +1,14 @@
+{% if current_user.is_authenticated %}
+    <ul class="list-group">
+        {% for file in files %}
+        <li class="list-group-item">
+            <div class="glyphicon-file">
+                {{file.name}}
+                <a class="btn-link" href="{{ url_for('download', filename = file.name) }}">下载</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <h1>您还未登陆</h1>
+{% endif %}

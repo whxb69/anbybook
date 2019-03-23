@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<items>
+	<item id="NodeList/GenericPrimaryKey/GenericTableConstraintColumn">
+		<column name="名称" visible="true" order="0" width="110"/>
+		<column name="所有者" visible="true" order="1" width="60"/>
+		<column name="Type" visible="true" order="2" width="108"/>
+	</item>
+	<item id="NodeList/GenericTableIndex/GenericTableIndexColumn">
+		<column name="索引名" visible="true" order="0" width="220"/>
+		<column name="表" visible="true" order="1" width="40"/>
+		<column name="索引类型" visible="true" order="2" width="75"/>
+		<column name="升序" visible="true" order="3" width="45"/>
+		<column name="唯一" visible="true" order="4" width="45"/>
+		<column name="限定子" visible="true" order="5" width="60"/>
+		<column name="基准" visible="true" order="6" width="45"/>
+		<column name="索引描述" visible="true" order="7" width="75"/>
+	</item>
+	<item id="NodeList/SQLiteTableColumn">
+		<column name="字段名" visible="true" order="0" width="136"/>
+		<column name="#" visible="true" order="1" width="32"/>
+		<column name="数据类型" visible="true" order="2" width="88"/>
+		<column name="Length" visible="true" order="3" width="65"/>
+		<column name="非空" visible="true" order="4" width="44"/>
+		<column name="自动递增" visible="true" order="5" width="74"/>
+		<column name="缺省" visible="true" order="6" width="44"/>
+		<column name="描述" visible="true" order="7" width="44"/>
+	</item>
+	<item id="projectExplorer">
+		<column name="Name" visible="true" order="0" width="227"/>
+		<column name="DataSource" visible="true" order="1" width="190"/>
+	</item>
+</items>

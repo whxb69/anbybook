@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Village{% endblock %}
+
+
+{% block index %}
+
+    <div  style='background-image: url("https://s1.ax1x.com/2018/05/29/C4OlVJ.jpg"); text-align:center; height: 350px' class="jumbotron" >
+
+            <p style="color: white" class="lead my-3">当前时间是 {{ moment(current_time).format('LLL') }}.</p>
+            {% if current_user.is_authenticated %}
+            <h1 style="color: white" class="lead my-3">安比图书平台</h1>
+            <p style="color: white" class="display-4 font-italic">Hello,{{ current_user.name }}</p>
+            <a style=" color: #fff;background-color: #6c757d; border-color: #6c757d;"class="btn btn-outline-secondary" href="{{ url_for('list') }}">查看书库</a>
+            {% else %}
+            <p style="color: white" class="display-4 font-italic">Hello,Stranger</p>
+            <a style=" color: #fff;background-color: #6c757d; border-color: #6c757d;"class="btn btn-outline-secondary" href="{{ url_for('register') }}">注册</a>
+            {% endif %}
+    </div>
+
+{% endblock %}

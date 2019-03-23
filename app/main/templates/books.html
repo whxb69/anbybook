@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block style %}
+<style>
+    div.itemdiv{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    img.itemimg{
+        width:20%;
+        height:auto;
+        }
+</style>
+{% endblock %}
+
+
+{% block title %}Village - Login{% endblock %}
+
+{%block page_content%}
+<div class="container">
+{% if current_user.is_authenticated %}
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active"><a href="#list" data-toggle="tab">列表</a></li>
+    <li><a href="#chart" data-toggle="tab">图表</a></li>
+</ul>
+
+    <div id="myTabContent" class="tab-content">
+	<div class="tab-pane fade in active" id="list">
+        <ul class="list-group">
+        {% for file in files %}
+        <li class="list-group-item">
+            <div class="glyphicon-file">
+                {{file.name}}
+                <a class="btn-mini" href="{{ url_for('download', filename = file.name) }}">下载</a>
+                {% if current_user.admin == 1%}
+                <a class="btn-mini" >删除</a>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div class="tab-pane fade" id="chart">
+		{% for file in files %}
+        <li class="list-group-item col-lg-6" id="items" style="border: 0">
+            <div class="row">
+                <div class="itemdiv col-sm-6 col-md-4">
+
+                        <img class = "itemimg" src="../static/download/{{ file.name }}/{{ file.name }}" alt="{{ file.name }}" >
+                            <div class="caption">
+                                <h4>{{ file.name }}</h4>
+                                <p><a href="{{ url_for('download', filename = file.name) }}" class="btn btn-default" role="button">下载</a></p>
+                                <!--<p>{{ file.artist }}</p>-->
+                                <!--<p><small>{{ file.introduction }}</small></p>-->
+                            </div>
+                        </div>
+
+                </div>
+            </li>
+        {% endfor %}
+	</div>
+</div>
+
+</div>
+<!-- <nav aria-label="Page navigation">
+    <ul class="pagination col-md-4">
+      <li>
+        <a href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li><a href="#">1</a></li>
+      <li><a href="#">2</a></li>
+      <li><a href="#">3</a></li>
+      <li><a href="#">4</a></li>
+      <li><a href="#">5</a></li>
+      <li>
+        <a href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav> -->
+
+{% else %}
+    <h1>您还未登陆</h1>
+    <hr>
+{% endif %}
+
+
+
+
+{% endblock %}

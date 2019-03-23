@@ -1,0 +1,6 @@
+{{user.username}} ,您好
+欢迎注册安比图书
+为了验证用户请点击如下链接：
+{{ url_for('confirm', token = token, _external = True )}}
+
+                                                安比图书
