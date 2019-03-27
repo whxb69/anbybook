@@ -20,7 +20,7 @@ class DevelopmentConfig(Config):
     MAIL_USE_SSL=False,
     MAIL_DEBUG=True,
     MAIL_USERNAME = 'anbybooks@hotmail.com',
-    MAIL_PASSWORD = 'anbydianzi123'
+    MAIL_PASSWORD = '**********'
 
 config = {
     'development':DevelopmentConfig
