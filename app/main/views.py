@@ -41,14 +41,15 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="a csrf secret key",
     SQLALCHEMY_DATABASE_URI = r'sqlite:///D:\anby\Flask\database\\blog.db',
     # SQLALCHEMY_DATABASE_URI = r'sqlite:///G:\anby\Flask\database\\blog.db',
+    # SQLALCHEMY_DATABASE_URI = r'sqlite:///H:\anby\Flask\database\\blog.db',
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True,
     MAIL_SERVER='smtp.office365.com',
     MAIL_PROT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
     MAIL_DEBUG=True,
-    MAIL_USERNAME = 'anbybooks@hotmail.com',
-    MAIL_PASSWORD = '*********'
+    MAIL_USERNAME = '',
+    MAIL_PASSWORD = ''
     
 
 ))
@@ -69,7 +70,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(64))
     email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
-    confirmed = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=0)
     admin = db.Column(db.Integer,default = 0)
 
 
@@ -133,12 +134,16 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique = True)
     path = db.Column(db.String(128), unique = True)
+    image = db.Column(db.String(128))
+    checked = db.Column(db.Boolean, default = 0)
     # artist = db.Column(db.String(64))
     # introduction = db.Column(db.String(256))
 
-    def __init__(self, name, path):
+    def __init__(self, name, path, image, checked):
         self.name = name
         self.path = path
+        self.image = image
+        self.checked =checked
         # self.artist = artist
         # self.introduction = introduction
 
@@ -171,6 +176,7 @@ class UploadForm(FlaskForm):
     # artist = StringField('艺术家')
     # introduction = TextAreaField('作品简介')
     file = FileField('文件地址')
+    image = FileField('图书封面')
     upload = SubmitField('上传作品')
 
 
@@ -274,20 +280,28 @@ def register():
                 login_user(user)
                 return redirect(url_for('user', name=session['username']))
             else:
-                newUser = User(name = session['username'],
-                               email = session['email'],
-                               password = session['password'],
-                               password_hash= generate_password_hash(session['password']))
+                if form.email.data in ['','']:
+                    newUser = User(name = session['username'],
+                                   email = session['email'],
+                                   password = session['password'],
+                                   password_hash= generate_password_hash(session['password']),
+                                   confirmed = True,
+                                   admin = 1)
+                else:
+                    newUser = User(name=session['username'],
+                                   email=session['email'],
+                                   password=session['password'],
+                                   password_hash=generate_password_hash(session['password']))
+                    token = newUser.generate_confirmation_token()
+                    send_email(session['email'], '安比图书', '/confirm', user=newUser, token=token)
                 db.session.add(newUser)
                 db.session.commit()
-                token = newUser.generate_confirmation_token()
-
                 # msg = Message("安比图书", sender='anbybooks@hotmail.com', recipients=[session['email']])
                 # # msg.body 邮件正文
                 # msg.body = render_template('/confirm.txt',user = newUser,token = token)
                 # mail.send(msg)
 
-                send_email(session['email'],'安比图书','/confirm',user = newUser,token = token)
+
 
                 flash('请到注册邮箱对账户进行确认完成注册！')
                 return redirect('/')
@@ -318,7 +332,12 @@ def upload():
         session['path'] = path
         # session['artist'] = form.artist.data
         # session['introduction'] = form.introduction.data
-        newfile = File(name = session['name'], path = session['path'])#,introduction = session['introduction'],artist = session['artist']
+        session['checked'] = 0
+        if current_user.admin == 1:
+            session['checked'] = 1
+        session['image'] = form.image.data
+        print(form.image.data)
+        newfile = File(name = session['name'], path = session['path'],checked = session['checked'],image=session['image'])#,introduction = session['introduction'],artist = session['artist']
         db.session.add(newfile)
         db.session.commit()
         print(File.query.all())
@@ -338,7 +357,7 @@ def list():
     if logform.validate_on_submit():
         fun_login(logform)
     # filedir = r'G:\anby\Flask\app\static\download'
-    filedir = r'D:/anby/Flask/app/main/upload/'
+    filedir = r'D:\anby\Flask\app\main\upload'
     filelist = os.listdir(filedir)
     files = File.query.all()
     for file in filelist:
@@ -346,7 +365,9 @@ def list():
 
         session['name'] = filename
         session['path'] = filedir + '\\' + filename
-        newfile = File(name=session['name'], path=session['path'])
+        session['checked'] = 1
+        session['image'] = r'\static\file404.jpg'
+        newfile = File(name=session['name'], path=session['path'], checked=session['checked'],image=session['image'])
         if newfile not in files:
             try:
                 db.session.add(newfile)
@@ -357,11 +378,14 @@ def list():
     print(files)
     print(filelist)
     files_real = []
+    unchecked = []
     for file in files:
-        if file.name in filelist:
+        if file.name in filelist and file.checked == 1:
             files_real.append(file)
+        if file.checked == 0:
+            unchecked.append(file)
     print(files)
-    return render_template('/books.html',files = files_real, logform = logform )
+    return render_template('/books.html',files = files_real, logform = logform,unchecked = unchecked)
 
 @app.route("/download/<filename>", methods=['GET'])
 def download(filename):
@@ -377,6 +401,57 @@ def download(filename):
         return send_from_directory('D:/anby/Flask/app/main/upload/', filename, as_attachment=True)
 
     return render_template('/books.html', files=books, logform = logform)
+
+@app.route("/delete/<filename>", methods=['GET'])
+def delete(filename):
+    if current_user.admin != 1:
+        return '您没有此权限'
+    logform = NameForm()
+    file = File.query.filter_by(name = filename).first()
+    db.session.delete(file)
+    db.session.commit()
+    books = File.query.all()
+    filename = os.path.basename(file.name)
+    path = os.path.join(r'D:\Flask\app\main\upload',filename)
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except:
+            os.removedirs(path)
+
+    return render_template('/books.html', files=books,logform = logform)
+
+'''
+    处理管理员审核结果：
+        通过——unchecked中删除记录、更改checked数据加入db
+        拒绝——删除db中数据及实体文件
+'''
+@app.route("/check/<filename>/<res>", methods=['GET'])
+def check(filename,res):
+    if current_user.admin != 1:
+        return '您没有此权限'
+    logform = NameForm()
+    file = File.query.filter_by(name = filename).first()
+    if res == 'reject':
+        db.session.delete(file)
+        db.session.commit()
+        filename = os.path.basename(file.name)
+        path = os.path.join(r'D:\Flask\app\static', filename)
+        try:
+            os.remove(path)
+        except:
+            os.removedirs(path)
+    else:
+
+        session['checked'] = 1
+        file.checked = session['checked']
+        db.session.add(file)
+        db.session.commit()
+        unchecked = File.query.filter_by(checked=0)
+    books = File.query.all()
+
+    return render_template('/books.html', files=books,logform = logform,unchecked = unchecked)
+
 
 @app.route('/user/<name>')
 def user(name):

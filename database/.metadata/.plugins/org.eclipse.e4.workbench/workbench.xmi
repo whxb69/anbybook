@@ -11,6 +11,7 @@
     <persistedState key="workingSets" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workingSets/>"/>
     <persistedState key="aggregateWorkingSetId"/>
     <tags>topLevel</tags>
+    <tags>shellMinimized</tags>
     <children xsi:type="basic:PartSashContainer" xmi:id="_OeQFQExqEemcscM9MNV--w" selectedElement="_OeQFQUxqEemcscM9MNV--w" horizontal="true">
       <children xsi:type="advanced:PerspectiveStack" xmi:id="_OeQFQUxqEemcscM9MNV--w" elementId="org.eclipse.ui.ide.perspectivestack" containerData="7500" selectedElement="_OkcM0ExqEemcscM9MNV--w">
         <children xsi:type="advanced:Perspective" xmi:id="_OkcM0ExqEemcscM9MNV--w" elementId="org.jkiss.dbeaver.core.perspective" selectedElement="_OkcM0UxqEemcscM9MNV--w" label="DBeaver" iconURI="platform:/plugin/org.jkiss.dbeaver.ui/icons/dbeaver_perspective.png">
@@ -142,6 +143,7 @@
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
         <tags>active</tags>
+        <tags>noFocus</tags>
         <children xsi:type="basic:Part" xmi:id="_U9O64ExqEemcscM9MNV--w" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="user" iconURI="platform:/plugin/org.jkiss.dbeaver.ui/icons/properties.png" closeable="true">
           <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;editor id=&quot;org.jkiss.dbeaver.ui.editors.entity.EntityEditor&quot; name=&quot;user&quot; partName=&quot;user&quot; title=&quot;user&quot; tooltip=&quot;&#x8868;: user &amp;#x0A;&#x8fde;&#x63a5;: SQLite - blog.db &amp;#x0A;&quot;>&#xD;&#xA;&lt;input class=&quot;org.jkiss.dbeaver.ui.editors.DatabaseNodeEditorInput&quot; data-source=&quot;sqlite_jdbc-169a40c92b2-5ed47571bbbc1e67&quot; factoryID=&quot;org.jkiss.dbeaver.ui.editors.DatabaseEditorInputFactory&quot; node=&quot;database://sqlite_jdbc-169a40c92b2-5ed47571bbbc1e67/org.jkiss.dbeaver.ext.generic.model.GenericTable/user&quot; node-name=&quot;user&quot; page=&quot;org.jkiss.dbeaver.ui.editors.data.DatabaseDataEditor&quot;/>&#xD;&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
@@ -270,7 +272,7 @@
     <trimBars xmi:id="_OeYBEExqEemcscM9MNV--w" elementId="org.eclipse.ui.main.toolbar">
       <children xsi:type="menu:ToolBar" xmi:id="_OfHA4ExqEemcscM9MNV--w" elementId="dbeaver-general">
         <tags>Draggable</tags>
-        <children xsi:type="menu:ToolBarSeparator" xmi:id="_rK86cEyPEemsetZnNfjUQQ" elementId="sql-tools"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="_iE7BgFFaEem9lM9NUO3Hsw" elementId="sql-tools"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_OfHn8ExqEemcscM9MNV--w" elementId="dbeaver-transactions">
         <tags>Draggable</tags>
@@ -1826,7 +1828,7 @@
   <addons xmi:id="_OP0As0xqEemcscM9MNV--w" elementId="MinMax Addon" contributorURI="platform:/plugin/org.jkiss.dbeaver.core.application" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.MinMaxAddon"/>
   <addons xmi:id="_OP0AtExqEemcscM9MNV--w" elementId="org.eclipse.ui.workbench.addon.0" contributorURI="platform:/plugin/org.jkiss.dbeaver.core.application" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_OP5gMExqEemcscM9MNV--w" elementId="SplitterAddon" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.splitteraddon.SplitterAddon"/>
-  <addons xmi:id="_q479YUyPEemsetZnNfjUQQ" elementId="org.eclipse.ui.ide.addon.0" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
+  <addons xmi:id="_IYS0IKimEeS11vbz3f9ezw" elementId="org.eclipse.ui.ide.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
   <addons xmi:id="_dz0JgGOlEeSMMaPQU2nlzw" elementId="org.eclipse.ui.ide.application.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide.application" contributionURI="bundleclass://org.eclipse.ui.ide.application/org.eclipse.ui.internal.ide.application.addons.ModelCleanupAddon"/>
   <categories xmi:id="_OQKl8ExqEemcscM9MNV--w" elementId="org.eclipse.team.ui.category.team" name="&#x5c0f;&#x7ec4;" description="&#x4e0e;&#x5c0f;&#x7ec4;&#x4e00;&#x8d77;&#x5de5;&#x4f5c;&#x65f6;&#x5e94;&#x7528;&#x7684;&#x64cd;&#x4f5c;"/>
   <categories xmi:id="_OQLNAExqEemcscM9MNV--w" elementId="org.eclipse.ui.category.views" name="&#x89c6;&#x56fe;" description="&#x6253;&#x5f00;&#x89c6;&#x56fe;&#x7684;&#x547d;&#x4ee4;"/>

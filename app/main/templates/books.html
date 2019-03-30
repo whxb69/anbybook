@@ -24,6 +24,10 @@
 <ul id="myTab" class="nav nav-tabs">
     <li class="active"><a href="#list" data-toggle="tab">列表</a></li>
     <li><a href="#chart" data-toggle="tab">图表</a></li>
+    {% if current_user.admin == 1%}
+    <li><a href="#unchecked" data-toggle="tab">待审核</a></li>
+    {% endif %}
+
 </ul>
 
     <div id="myTabContent" class="tab-content">
@@ -35,7 +39,7 @@
                 {{file.name}}
                 <a class="btn-mini" href="{{ url_for('download', filename = file.name) }}">下载</a>
                 {% if current_user.admin == 1%}
-                <a class="btn-mini" >删除</a>
+                <a class="btn-mini" href="{{ url_for('delete', filename = file.name) }}">删除</a>
                 {% endif %}
             </div>
         </li>
@@ -49,7 +53,7 @@
             <div class="row">
                 <div class="itemdiv col-sm-6 col-md-4">
 
-                        <img class = "itemimg" src="../static/download/{{ file.name }}/{{ file.name }}" alt="{{ file.name }}" >
+                        <img class = "itemimg" src="{{ file.image }}" alt="{{ file.name }}" >
                             <div class="caption">
                                 <h4>{{ file.name }}</h4>
                                 <p><a href="{{ url_for('download', filename = file.name) }}" class="btn btn-default" role="button">下载</a></p>
@@ -62,6 +66,20 @@
             </li>
         {% endfor %}
 	</div>
+
+    <div class="tab-pane fade" id="unchecked">
+        <ul class="list-group">
+        {% for file in unchecked %}
+        <li class="list-group-item">
+            <div class="glyphicon-file">
+                {{file.name}}
+                <a class="btn-mini" href="{{ url_for('check', filename = file.name, res = 'pass' , unchecked = unchecked)}}">通过</a>
+                <a class="btn-mini" href="{{ url_for('check', filename = file.name, res = 'reject', unchecked = unchecked) }}">不通过</a>
+            </div>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
 </div>
 
 </div>
