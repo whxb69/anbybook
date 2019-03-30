@@ -67,7 +67,7 @@
                 <li class="nav navbar-nav navbar-right">
                     <div class="usermenu">
                         <a type="button" role = "button" class="user dropdown-toggle" data-toggle="dropdown">
-                            <img src="../../static/user.jpg" class="img-responsive img-circle">
+                            <img src="{{ current_user.gravatar() }}" class="img-responsive img-rounded profile-thumbnail">
                         </a>
 
                         <ul class="dropdown-menu" id = "user-menu">

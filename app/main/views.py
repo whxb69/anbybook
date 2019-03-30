@@ -184,7 +184,7 @@ class UploadForm(FlaskForm):
 @app.before_first_request
 def create_db():
   # Recreate database each time for demo
-  # db.drop_all()
+  db.drop_all()
   db.create_all()
   # try:
   #     logout_user()
@@ -280,23 +280,26 @@ def register():
                 login_user(user)
                 return redirect(url_for('user', name=session['username']))
             else:
-                if form.email.data in ['','']:
-                    newUser = User(name = session['username'],
-                                   email = session['email'],
-                                   password = session['password'],
-                                   password_hash= generate_password_hash(session['password']),
-                                   confirmed = True,
-                                   admin = 1)
+                newUser = User(name=session['username'],
+                               email=session['email'],
+                               password=session['password'],
+                               password_hash=generate_password_hash(session['password']))
+                    # newUser = User(name = session['username'],
+                    #                email = session['email'],
+                    #                password = session['password'],
+                    #                password_hash= generate_password_hash(session['password']),
+                    #                confirmed = True,
+                    #                admin = 1)
+                    newUser.confirmed = True
+                    newUser.admin = 1
+                    db.session.add(newUser)
+                    db.session.commit()
                 else:
-                    newUser = User(name=session['username'],
-                                   email=session['email'],
-                                   password=session['password'],
-                                   password_hash=generate_password_hash(session['password']))
+                    db.session.add(newUser)
+                    db.session.commit()
                     token = newUser.generate_confirmation_token()
                     send_email(session['email'], '安比图书', '/confirm', user=newUser, token=token)
                     flash('请到注册邮箱对账户进行确认完成注册！')
-                db.session.add(newUser)
-                db.session.commit()
                 return redirect('/')
     return render_template('/register.html', form =form, logform = logform)
 
