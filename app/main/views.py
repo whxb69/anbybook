@@ -184,7 +184,7 @@ class UploadForm(FlaskForm):
 @app.before_first_request
 def create_db():
   # Recreate database each time for demo
-  db.drop_all()
+  # db.drop_all()
   db.create_all()
   # try:
   #     logout_user()
@@ -294,16 +294,9 @@ def register():
                                    password_hash=generate_password_hash(session['password']))
                     token = newUser.generate_confirmation_token()
                     send_email(session['email'], '安比图书', '/confirm', user=newUser, token=token)
+                    flash('请到注册邮箱对账户进行确认完成注册！')
                 db.session.add(newUser)
                 db.session.commit()
-                # msg = Message("安比图书", sender='anbybooks@hotmail.com', recipients=[session['email']])
-                # # msg.body 邮件正文
-                # msg.body = render_template('/confirm.txt',user = newUser,token = token)
-                # mail.send(msg)
-
-
-
-                flash('请到注册邮箱对账户进行确认完成注册！')
                 return redirect('/')
     return render_template('/register.html', form =form, logform = logform)
 
@@ -312,7 +305,7 @@ def upload():
     form = UploadForm()
     logform = NameForm()
     if logform.validate_on_submit():
-        fun_login(logform)
+        return fun_login(logform)
     # try:
     if request.method == 'POST':
         # try:
@@ -335,8 +328,16 @@ def upload():
         session['checked'] = 0
         if current_user.admin == 1:
             session['checked'] = 1
-        session['image'] = form.image.data
-        print(form.image.data)
+
+        image = request.files['image']
+        image_path = os.path.join(upload_path,r'image/')
+        isExists = os.path.exists(image_path)
+        if not isExists:
+            os.makedirs(image_path)
+        imagepath = r'./static/' + image.filename
+        image.save(imagepath)
+        session['image'] = r'../static/' + image.filename
+
         newfile = File(name = session['name'], path = session['path'],checked = session['checked'],image=session['image'])#,introduction = session['introduction'],artist = session['artist']
         db.session.add(newfile)
         db.session.commit()
@@ -366,9 +367,9 @@ def list():
         session['name'] = filename
         session['path'] = filedir + '\\' + filename
         session['checked'] = 1
-        session['image'] = r'\static\file404.jpg'
+        session['image'] = r'../static/file404.jpg'
         newfile = File(name=session['name'], path=session['path'], checked=session['checked'],image=session['image'])
-        if newfile not in files:
+        if newfile not in files and not os.path.isdir(session['path']):
             try:
                 db.session.add(newfile)
                 db.session.commit()
@@ -396,7 +397,7 @@ def download(filename):
     books = File.query.all()
     filename = os.path.basename(file.name)
     print(filename)
-    print(os.path.join('/static/download/', filename))
+    # print(os.path.join('/static/download/', filename))
     if os.path.isfile(os.path.join('D:/anby/Flask/app/main/upload/', filename)):
         return send_from_directory('D:/anby/Flask/app/main/upload/', filename, as_attachment=True)
 
@@ -410,17 +411,16 @@ def delete(filename):
     file = File.query.filter_by(name = filename).first()
     db.session.delete(file)
     db.session.commit()
-    books = File.query.all()
     filename = os.path.basename(file.name)
-    path = os.path.join(r'D:\Flask\app\main\upload',filename)
+    path = os.path.join(r'D:\anby\Flask\app\main\upload',filename)
     if os.path.exists(path):
         try:
             os.remove(path)
         except:
             os.removedirs(path)
-
-    return render_template('/books.html', files=books,logform = logform)
-
+    books = File.query.all()
+    # return render_template('/books.html', files=books, logform = logform)
+    return redirect(url_for('list'))
 '''
     处理管理员审核结果：
         通过——unchecked中删除记录、更改checked数据加入db
@@ -436,7 +436,7 @@ def check(filename,res):
         db.session.delete(file)
         db.session.commit()
         filename = os.path.basename(file.name)
-        path = os.path.join(r'D:\Flask\app\static', filename)
+        path = os.path.join(r'D:\Flask\app\main\upload', filename)
         try:
             os.remove(path)
         except:
