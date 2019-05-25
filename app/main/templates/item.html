@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Village - item{% endblock %}
+
+{%block page_content%}
+<div class="container">
+    <div class="row">
+      <div class="col-xs-6 col-md-4">
+        <a href="#" class="thumbnail">
+          <img src="data:image/jpg;base64,{{cover}}" alt="...">
+        </a>
+      </div>
+
+      <div class="col-xs-6 col-md-5">
+          <ul class="list-group">
+            {% for info in infos %}
+              <li class="list-group-item">{{info}}</li>
+            {% endfor %}
+          </ul>
+          <div class="col-xs-6 col-md-5"><h2>简介</h2>
+          {% for tag in tags %}
+            <span class="label label-info">{{tag}}</span>
+          {% endfor %}
+          </div>
+          <p>{{intro}}</p>
+      </div>
+      
+      {% if buy %}
+      <div class="col-xs-6 col-md-3">
+        <h3>购买信息</h3>
+        <ul class="list-group">
+        {% for b in buy %}
+            <li class="list-group-item"><a href={{b.link}}>{{b.site}}   {{b.price}}</a></li>
+        {% endfor%}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    <div class = "recs row">
+      <h2>相关推荐</h2>
+      <div class="col-xs-3 col-md-10">
+        {% for rec in rec1 %}
+        <dl class="col-xs-3 col-md-2">
+          <dt>
+            <a class="thumbnail" href="{{ url_for('item', no = rec.itemno) }}">
+                {% if rec == None %}
+                <img src="../static/cover.png">
+                {% else %}
+                <img src="data:image/jpg;base64,{{rec.cover}}">
+                {% endif %}
+            </a>
+          </dt>
+          <dd>
+            <a href="{{ url_for('item', no = rec.itemno) }}">
+              <p class = "text-center">{{rec.title}}</p>
+            </a>
+          </dd>
+        </dl>
+        {% endfor %}
+      </div>
+      <div class="col-xs-3 col-md-10">
+        {% for rec in rec2 %}
+        <dl class="col-xs-3 col-md-2">
+            <dt>
+              <a class="thumbnail" href="{{ url_for('item', no = rec.itemno) }}">
+                {% if rec == None %}
+                <img src="../static/cover.png">
+                {% else %}
+                <img src="data:image/jpg;base64,{{rec.cover}}">
+                {% endif %}
+              </a>
+            </dt>
+            <dd>
+              <a  href="{{ url_for('item', no = rec.itemno) }}">
+                <p class = "text-center">{{rec.title}}</p>
+              </a>
+            </dd>
+          </dl>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

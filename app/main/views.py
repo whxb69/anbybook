@@ -16,6 +16,8 @@ from threading import Thread
 import sys
 import hashlib    #models
 import urllib
+import sqlite3
+import base64
 
 # from . import main
 # from .. import db
@@ -34,22 +36,25 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
 login_manager.init_app(app)
-
+dirs = {
+    'anby':r'D:\anby\Flask',
+    'dorm':r'G:\anby\Flask',
+    'lab':r'H:\anby\Flask'
+}
+diskdir = dirs['anby']
 
 app.config.update(dict(
     SECRET_KEY="powerful secretkey",
     WTF_CSRF_SECRET_KEY="a csrf secret key",
-    SQLALCHEMY_DATABASE_URI = r'sqlite:///D:\anby\Flask\database\\blog.db',
-    # SQLALCHEMY_DATABASE_URI = r'sqlite:///G:\anby\Flask\database\\blog.db',
-    # SQLALCHEMY_DATABASE_URI = r'sqlite:///H:\anby\Flask\database\\blog.db',
+    SQLALCHEMY_DATABASE_URI = r'sqlite:///' + diskdir + r'\database\\blog-1.db',
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True,
     MAIL_SERVER='smtp.office365.com',
     MAIL_PROT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
     MAIL_DEBUG=True,
-    MAIL_USERNAME = '',
-    MAIL_PASSWORD = ''
+    MAIL_USERNAME = 'anbybooks@hotmail.com',
+    MAIL_PASSWORD = 'anby123dianzi'
     
 
 ))
@@ -150,6 +155,34 @@ class File(db.Model):
     def __repr__(self):
         return '<File %r>' % self.name
 
+class Item(db.Model):
+    __tablename__ = 'books'
+    id = db.Column(db.Integer, primary_key=True,unique = True)
+    title = db.Column(db.String(128))
+    intro = db.Column(db.String(4096))
+    isbn = db.Column(db.String(64),unique = True)
+    cover = db.Column(db.String(262144))
+    itemno = db.Column(db.String(64),unique = True)
+    tags = db.Column(db.String(64))
+    subno = db.Column(db.String(64),unique = True)
+    recnos = db.Column(db.String(512))
+    infos = db.Column(db.String(1024))
+    buy = db.Column(db.String(256))
+    # introduction = db.Column(db.String(256))
+
+    def __init__(self, title, intro, isbn, house, cover, itemno, tags,subno, recnos, infos, buy):
+        self.title = title
+        self.intro = intro
+        self.isbn = isbn
+        self.cover = cover
+        self.itemno = itemno
+        self.tags = tags
+        self.infos = infos
+        self.buy = buy
+
+    def __repr__(self):
+        return '<File %r>' % self.title
+
 
 class NameForm(FlaskForm):
     username = StringField('用户名', validators=[Required()])
@@ -179,12 +212,16 @@ class UploadForm(FlaskForm):
     image = FileField('图书封面')
     upload = SubmitField('上传作品')
 
+class SearchForm(FlaskForm):
+    target = StringField()
+    go = SubmitField('搜索')
+
 
 
 @app.before_first_request
 def create_db():
   # Recreate database each time for demo
-  db.drop_all()
+#   db.drop_all()
   db.create_all()
   # try:
   #     logout_user()
@@ -360,8 +397,7 @@ def list():
     logform = NameForm()
     if logform.validate_on_submit():
         fun_login(logform)
-    # filedir = r'G:\anby\Flask\app\static\download'
-    filedir = r'D:\anby\Flask\app\main\upload'
+    filedir = diskdir + r'\app\download'
     filelist = os.listdir(filedir)
     files = File.query.all()
     for file in filelist:
@@ -391,6 +427,37 @@ def list():
     print(files)
     return render_template('/books.html',files = files_real, logform = logform,unchecked = unchecked)
 
+@app.route('/items/page=<page>&form=<format>', methods=['POST', 'GET'])
+def items(page,format='list'):
+    logform = NameForm()
+    form = SearchForm()
+    page = int(page)
+    itemlist = range((page-1)*20+1,page*20,1)
+    items = Item.query.filter(Item.id.in_(itemlist))
+    print(items)
+
+    return render_template('/items.html',logform = logform,items = items,page = page,form = form,format=format)
+
+'''cate：搜索的类别（书名 作者 isbn）
+   para：搜索的关键字
+   isbn搜索需提供至少七位
+'''
+@app.route('/items/search/<cate>/<para>', methods=['POST', 'GET'])
+def search(para,cate):
+    logform = NameForm()
+    form = SearchForm()
+    # if request.method == 'POST':
+    cates = {
+        '书名':Item.title.like('%' + para + '%'),
+        'ISBN':Item.isbn.like('%' + para + '%')
+    }
+    if cate == 'ISBN' and len(para)<7:
+        flash('请提供七位以上ISBN')
+        return redirect(url_for('items'))
+    else:
+        items = Item.query.filter(cates[cate])
+        return render_template('/items.html', logform=logform, items=items, form=form)
+
 @app.route("/download/<filename>", methods=['GET'])
 def download(filename):
     if current_user.confirmed != 1:
@@ -415,7 +482,7 @@ def delete(filename):
     db.session.delete(file)
     db.session.commit()
     filename = os.path.basename(file.name)
-    path = os.path.join(r'D:\anby\Flask\app\main\upload',filename)
+    path = os.path.join(diskdir + r'\app\main\upload',filename)
     if os.path.exists(path):
         try:
             os.remove(path)
@@ -488,6 +555,51 @@ def useredit(name):
             pass
         return redirect('/')
     return render_template('/user-edit.html', form=form, logform = logform)
+
+@app.route('/item/<no>')
+def item(no):
+    logform = NameForm()
+    item = Item.query.filter_by(itemno = no).first()
+    title = item.title
+    intro = item.intro
+    isbn = item.isbn
+    infos = item.infos
+    cover = item.cover
+    tags = item.tags.split('\t')
+    buys = item.buy
+    
+    rec1 = []
+    rec2 = []
+    recs = item.recnos
+    if len(recs) > 0:
+        recs = recs.split()   
+        for i,rec in enumerate(recs):
+            item = Item.query.filter_by(subno = rec).first()
+            if i < 5:
+                rec1.append(item)
+            else:
+                rec2.append(item)
+
+    infos = infos.split('\n')
+    infos.insert(0,'标题：'+title)
+    
+    buy = []
+    buys = buys.split('\n')
+    if len(buys) > 0 and buys[0] != '':
+        for b in buys:
+            binfo = b.split('\t')
+            info = {
+                'site':binfo[0],
+                'price':binfo[1],
+                'link':binfo[2]
+            }
+            buy.append(info)
+    
+    print(buy)
+            
+    return render_template('/item.html',logform = logform,no = no,cover = cover,title = title,intro = intro, 
+                                        isbn = isbn, infos = infos,tags = tags,rec1 = rec1,rec2 = rec2,buy = buy)
+
 
 @app.route('/confirm/<token>')
 @login_required
