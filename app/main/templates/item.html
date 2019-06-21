@@ -33,8 +33,14 @@
             <li class="list-group-item"><a href={{b.link}}>{{b.site}}   {{b.price}}</a></li>
         {% endfor%}
         </ul>
-      </div>
       {% endif %}
+       <h3>电子书下载</h3>
+        <ul class="list-group">
+            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'epub')}}" >epub</a></li>
+            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'pdf')}}" >pdf</a></li>
+            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'azw3')}}" >azw3</a></li>
+        </ul>
+       </div>
     </div>
     <div class = "recs row">
       <h2>相关推荐</h2>
