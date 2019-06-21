@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, flash, request, send_from_directory
+from flask import Flask, render_template, session, redirect, url_for, flash, request, send_from_directory,send_file
 from flask_bootstrap import Bootstrap
 from wtforms import StringField, SubmitField, PasswordField, FileField, BooleanField, TextAreaField
 from wtforms.validators import Required, Email, EqualTo
@@ -41,7 +41,7 @@ dirs = {
     'dorm':r'G:\anby\Flask',
     'lab':r'H:\anby\Flask'
 }
-diskdir = dirs['anby']
+diskdir = dirs['lab']
 
 app.config.update(dict(
     SECRET_KEY="powerful secretkey",
@@ -321,6 +321,7 @@ def register():
                                email=session['email'],
                                password=session['password'],
                                password_hash=generate_password_hash(session['password']))
+                if form.email.data in ['407812874@qq.com','anbybooks@hotmail.com']:
                     # newUser = User(name = session['username'],
                     #                email = session['email'],
                     #                password = session['password'],
@@ -392,6 +393,7 @@ def upload():
 
     return render_template('/upload.html', form =form, logform = logform)
 
+
 @app.route('/books', methods=['POST', 'GET'])
 def list():
     logform = NameForm()
@@ -427,12 +429,13 @@ def list():
     print(files)
     return render_template('/books.html',files = files_real, logform = logform,unchecked = unchecked)
 
+#TODO 将展示页的list和chart分离开
 @app.route('/items/page=<page>&form=<format>', methods=['POST', 'GET'])
 def items(page,format='list'):
     logform = NameForm()
     form = SearchForm()
     page = int(page)
-    itemlist = range((page-1)*20+1,page*20,1)
+    itemlist = range((page-1)*21+1,page*21,1)
     items = Item.query.filter(Item.id.in_(itemlist))
     print(items)
 
@@ -473,6 +476,19 @@ def download(filename):
 
     return render_template('/books.html', files=books, logform = logform)
 
+'''
+按格式下载电子书
+itemno：商品号
+format：文件格式 in [epub,pdf,awz3]
+'''
+@app.route("/download/<itemno>?<format>", methods=['GET'])
+def down(itemno,format):
+    filename = itemno + '.' + format
+    if os.path.isfile(os.path.join(diskdir + r'/app/main/upload/' + format + '//', filename)):
+        return send_from_directory(diskdir + r'/app/main/upload/', format + '//' + filename, as_attachment=True)
+    return render_template('/item.html',no = itemno)
+
+'''管理员删除上传的文件'''
 @app.route("/delete/<filename>", methods=['GET'])
 def delete(filename):
     if current_user.admin != 1:
@@ -556,6 +572,15 @@ def useredit(name):
         return redirect('/')
     return render_template('/user-edit.html', form=form, logform = logform)
 
+'''
+商品页面
+item：书(object) 后为相关信息及封面图
+rec1,2：第1,2排推荐内容
+buy：购买信息
+    price:价格
+    site：网站名
+    link：购买页链接
+'''
 @app.route('/item/<no>')
 def item(no):
     logform = NameForm()
@@ -600,7 +625,9 @@ def item(no):
     return render_template('/item.html',logform = logform,no = no,cover = cover,title = title,intro = intro, 
                                         isbn = isbn, infos = infos,tags = tags,rec1 = rec1,rec2 = rec2,buy = buy)
 
-
+'''
+返回邮件验证结果
+'''
 @app.route('/confirm/<token>')
 @login_required
 def confirm(token):
