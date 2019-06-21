@@ -9,6 +9,8 @@
         justify-content:center;
     }
 
+
+
 </style>
 {% endblock %}
 
@@ -16,6 +18,14 @@
 {% block title %}Village - Items{% endblock %}
 
 {%block page_content%}
+<style>
+    .bookimg{
+        height: 344px;
+        width: auto;
+        margin: 5px;
+    }
+</style>
+
 <script>
 function search() {
     var filter = document.getElementById("filter").innerText;
@@ -83,15 +93,15 @@ function tolist(page) {
 
     <div class="tab-pane fade" id="chart">
 		{% for item in items %}
-        <div class="col-md-6 col-md-6 row">
-          <div class="media-left col-xs-4 col-sm-6">
+        <div class="col-md-6 col-md-6 row ">
+          <div class="media-left col-xs-4 col-sm-6" style="overflow:hidden" >
             <a href="{{ url_for('item', no = item.itemno) }}">
-              <img class="img-thumbnail" src="data:image/jpg;base64,{{item.cover}}" alt="Anby Book">
+              <img class="img-thumbnail bookimg" src="data:image/jpg;base64,{{item.cover}}" alt="Anby Book">
             </a>
           </div>
           <div class=" col-xs-8 col-sm-6">
             <h4>{{item.title}}</h4>
-            ...
+              
           </div>
         </div>
     {% endfor %}
