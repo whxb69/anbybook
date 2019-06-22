@@ -35,11 +35,18 @@
         </ul>
       {% endif %}
        <h3>电子书下载</h3>
-        <ul class="list-group">
-            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'epub')}}" >epub</a></li>
-            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'pdf')}}" >pdf</a></li>
-            <li class="list-group-item"><a href="{{ url_for('down',itemno = no,format = 'azw3')}}" >azw3</a></li>
-        </ul>
+          <div style="display: inline;padding-right: 50px">
+                <i class="fa fa-book fa-lg" aria-hidden="true"></i>
+                <a href="{{ url_for('down',itemno = no,format = 'epub')}}" >epub</a>
+              </div>
+          <div style="display: inline;padding-right: 50px">
+                <i class="fa fa-file-pdf-o fa-lg" aria-hidden="true"></i>
+                <a href="{{ url_for('down',itemno = no,format = 'pdf')}}" >  pdf</a>
+          </div>
+          <div style="display: inline">
+                <i class="fa fa-amazon fa-lg" aria-hidden="true"></i>
+                <a href="{{ url_for('down',itemno = no,format = 'azw3')}}" >azw3</a>
+          </div>
        </div>
     </div>
     <div class = "recs row">
