@@ -1,10 +1,10 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% block head%}
 {%block metas%}
     {{super()}}
     <meta charset="UTF-8">
 {%endblock%}
-
 {%block styles%}
     {{super()}}
 <style>
@@ -40,7 +40,10 @@
 </style>
 {%endblock%}
 
+<link rel="stylesheet" href="../static/font-awesome-4.7.0/css/font-awesome.min.css">
+{%endblock%}
 {% block title %}Village{% endblock %}
+
 {% block scripts %}
 {{ super()}}
 {{ moment.include_moment() }}
