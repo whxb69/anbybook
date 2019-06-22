@@ -41,7 +41,7 @@ dirs = {
     'dorm':r'G:\anby\Flask',
     'lab':r'H:\anby\Flask'
 }
-diskdir = dirs['lab']
+diskdir = dirs['anby']
 
 app.config.update(dict(
     SECRET_KEY="powerful secretkey",
@@ -209,8 +209,8 @@ class UploadForm(FlaskForm):
     # artist = StringField('艺术家')
     # introduction = TextAreaField('作品简介')
     file = FileField('文件地址')
-    image = FileField('图书封面')
-    upload = SubmitField('上传作品')
+    # image = FileField('图书封面')
+    upload = SubmitField('上传书籍')
 
 class SearchForm(FlaskForm):
     target = StringField()
@@ -353,13 +353,18 @@ def upload():
         f = request.files['file']
         basepath = os.path.dirname(__file__)  # 当前文件所在路径
         print(basepath)
-        upload_path = os.path.join(basepath,r'upload/')  #注意：没有的文件夹一定要先创建，不然会提示没有该路径
+
+        Format = os.path.splitext(f.filename)[1][1:]
+        # 注意：没有的文件夹一定要先创建，不然会提示没有该路径
+        upload_path = os.path.join(basepath,r'upload/'+Format+'/')
         print(upload_path)
         isExists = os.path.exists(upload_path)
         if not isExists:
             os.makedirs(upload_path)
+
         path = upload_path + f.filename
         print(path)
+
         f.save(path)
 
         session['name'] = f.filename
@@ -370,16 +375,16 @@ def upload():
         if current_user.admin == 1:
             session['checked'] = 1
 
-        image = request.files['image']
-        image_path = os.path.join(upload_path,r'image/')
-        isExists = os.path.exists(image_path)
-        if not isExists:
-            os.makedirs(image_path)
-        imagepath = r'./static/' + image.filename
-        image.save(imagepath)
-        session['image'] = r'../static/' + image.filename
+        # image = request.files['image']
+        # image_path = os.path.join(upload_path,r'image/')
+        # isExists = os.path.exists(image_path)
+        # if not isExists:
+        #     os.makedirs(image_path)
+        # imagepath = r'./static/' + image.filename
+        # image.save(imagepath)
+        # session['image'] = r'../static/' + image.filename
 
-        newfile = File(name = session['name'], path = session['path'],checked = session['checked'],image=session['image'])#,introduction = session['introduction'],artist = session['artist']
+        newfile = File(name = session['name'], path = session['path'],checked = session['checked'],image=None)#,introduction = session['introduction'],artist = session['artist']
         db.session.add(newfile)
         db.session.commit()
         print(File.query.all())
@@ -393,7 +398,10 @@ def upload():
 
     return render_template('/upload.html', form =form, logform = logform)
 
+'''
+已上传文件的展示页面
 
+'''
 @app.route('/books', methods=['POST', 'GET'])
 def list():
     logform = NameForm()
@@ -471,8 +479,8 @@ def download(filename):
     filename = os.path.basename(file.name)
     print(filename)
     # print(os.path.join('/static/download/', filename))
-    if os.path.isfile(os.path.join('D:/anby/Flask/app/main/upload/', filename)):
-        return send_from_directory('D:/anby/Flask/app/main/upload/', filename, as_attachment=True)
+    if os.path.isfile(os.path.join(diskdir + r'/app/main/upload/', filename)):
+        return send_from_directory(diskdir + r'/app/main/upload/', filename, as_attachment=True)
 
     return render_template('/books.html', files=books, logform = logform)
 
@@ -483,10 +491,13 @@ format：文件格式 in [epub,pdf,awz3]
 '''
 @app.route("/download/<itemno>?<format>", methods=['GET'])
 def down(itemno,format):
+    logform = NameForm()
     filename = itemno + '.' + format
     if os.path.isfile(os.path.join(diskdir + r'/app/main/upload/' + format + '//', filename)):
         return send_from_directory(diskdir + r'/app/main/upload/', format + '//' + filename, as_attachment=True)
-    return render_template('/item.html',no = itemno)
+    else:
+        flash('暂无')
+        return redirect(url_for('item',no = itemno))
 
 '''管理员删除上传的文件'''
 @app.route("/delete/<filename>", methods=['GET'])
